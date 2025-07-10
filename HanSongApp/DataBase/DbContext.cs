@@ -9,7 +9,7 @@ namespace HanSongApp.DataBase
         public SqlSugarClient Instance => _client ?? (_client = new SqlSugarClient(
             new ConnectionConfig()
             {
-                ConnectionString = "Server=10.10.1.80;Port=3306;Database=TagsManage;Uid=htsusr;Pwd=HtsUsr.1;Connect Timeout=10;CharSet=utf8mb4;Pooling=false;",
+                ConnectionString = "Server=10.10.1.80;Port=3306;Database=hts_pcs;Uid=htsusr;Pwd=HtsUsr.1;Connect Timeout=10;CharSet=utf8mb4;Pooling=false;",
                 DbType = DbType.MySql,
                 IsAutoCloseConnection = true,
                 InitKeyType = InitKeyType.Attribute

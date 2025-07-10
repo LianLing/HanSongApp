@@ -2,12 +2,15 @@
 
 namespace HanSongApp.Views
 {
-    public partial class ScanBarCodePage : ContentPage
+    public partial class SingleRepositoryInPage : ContentPage
     {
         CheckStationService stationService = new(); 
-        public ScanBarCodePage()
+        private readonly ApiService _apiService;
+        public SingleRepositoryInPage(ApiService apiService)
         {
+            apiService = _apiService;
             var result = stationService.GetStations();
+            //var resul1 = _apiService.GetStations(input, type_code); 
         }
         private void OnBarcodeTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -23,7 +26,6 @@ namespace HanSongApp.Views
         {
 
         }
-
         private void OnViewHistoryClicked(object sender, EventArgs e)
         {
 

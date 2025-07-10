@@ -4,16 +4,19 @@ namespace HanSongApp
 {
     public partial class MainPage : ContentPage
     {
+        private readonly IServiceProvider _serviceProvider;
 
-        public MainPage()
+        public MainPage(IServiceProvider serviceProvider)
         {
             InitializeComponent();
+            _serviceProvider = serviceProvider;
         }
 
-
-        private void SignIn_Clicked(object sender, EventArgs e)
+        private async void OnNavigateToScanner(object sender, EventArgs e)
         {
-            Navigation.PushAsync(new ScanBarCodePage());
+            // 通过依赖注入获取页面
+            var conditionPage = _serviceProvider.GetRequiredService<SelectConditionPage>();
+            await Navigation.PushAsync(conditionPage);
         }
     }
 

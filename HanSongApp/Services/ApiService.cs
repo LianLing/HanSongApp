@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using HanSongApp.Models;
+using HanSongApp.Views;
+using Microsoft.Maui.Storage;
+using System.Diagnostics;
+using System.Net.Http.Headers;
+
+using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HanSongApp.Services
 {
-    using Microsoft.Maui.Storage; // for Preferences
-    using System.Diagnostics;
-    using System.Net.Http.Headers;
-    // ApiService.cs
-    using System.Net.Http.Json;
-    using System.Text;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
-
     public class ApiService
     {
         private readonly HttpClient _httpClient;
@@ -35,13 +31,38 @@ namespace HanSongApp.Services
 
             // 设置基础URL（生产环境/开发环境切换）
 #if DEBUG
-            _httpClient.BaseAddress = new Uri("https://dev-api.industrial.com/v1");
+            _httpClient.BaseAddress = new Uri("http://10.10.38.158:8201/htsapi/db1v0/");
 #else
         _httpClient.BaseAddress = new Uri("https://api.industrial.com/v1");
 #endif
 
             // 设置默认超时时间
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
+        }
+
+
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        public async Task<ApiResponse<LoginResponse>> LoginAsync(string username, string password)
+        {
+            if (!IsNetworkAvailable())
+                return ApiResponse<LoginResponse>.NoNetwork();
+
+            try
+            {
+                var request = new LoginRequest
+                {
+                    Username = username,
+                    Password = password
+                };
+
+                return await PostAsync<LoginRequest, LoginResponse>("auth/login", request);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<LoginResponse>.Error($"登录失败: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -207,7 +228,39 @@ namespace HanSongApp.Services
             }
             return true;
         }
+
+        //public async Task<List<SnInfo>> GetStations(SnInfo input, string type_code)
+        //{
+        //    if (!IsNetworkAvailable())
+        //        return new List<SnInfo>(); // 修复：返回一个空的 List<f> 而不是 ApiResponse<SnInfo>
+
+        //    try
+        //    {
+        //        var request = new SnInfo
+        //        {
+        //            // 根据需要填充 request 对象
+        //        };
+
+        //        var response = await PostAsync<SnInfo, List<SnInfo>>("stations/get", request); 
+        //        if (response.IfSuccess)
+        //        {
+        //            return response.Data; // 返回成功的结果
+        //        }
+        //        else
+        //        {
+        //            Debug.WriteLine($"获取站点失败: {response.ErrorMessage}");
+        //            return new List<SnInfo>(); // 返回空列表以处理失败情况
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"获取站点异常: {ex.Message}");
+        //        return new List<SnInfo>(); // 返回空列表以处理异常情况
+        //    }
+        //}
     }
+
+     
 
     /// <summary>
     /// API响应封装类

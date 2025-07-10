@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace HanSongApp.Views
 {
-    // LoginPage.xaml.cs
     public partial class LoginPage : ContentPage
     {
         private readonly ApiService _apiService;
@@ -35,15 +34,7 @@ namespace HanSongApp.Views
 
             try
             {
-                var response = await _apiService.PostAsync<LoginRequest, LoginResponse>(
-                    "auth/login",
-                    new LoginRequest
-                    {
-                        Username = username,
-                        Password = password,
-                        DeviceId = DeviceInfo.Current.Model
-                    },
-                    retryOnFailure: true);
+                var response = await _apiService.LoginAsync(username, password);
 
                 if (response.IfSuccess)
                 {

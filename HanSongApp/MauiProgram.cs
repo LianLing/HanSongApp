@@ -54,26 +54,23 @@ namespace HanSongApp
             // 注册其他所需服务
             builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
 
-            // 注册主页面
-            builder.Services.AddSingleton<MainPage>();
-
+            // 注册所有页面
+            builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<SingleRepositoryInPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<SelectConditionPage>();
+            
 
             // 注册数据库上下文
             builder.Services.AddSingleton<DbContext>();
 
             // 注册服务
             builder.Services.AddSingleton<CheckStationService>();
-            builder.Services.AddTransient<ScanBarCodePage>();
 
             // 配置导航服务
             var app = builder.Build();
             return builder.Build();
         }
-        private static Stream GetAppSettingsStream()
-        {
-            // 从程序集资源中读取 appsettings.json
-            var assembly = Assembly.GetExecutingAssembly();
-            return assembly.GetManifestResourceStream("HanSongApp.appsettings.json");
-        }
+
     }
 }
