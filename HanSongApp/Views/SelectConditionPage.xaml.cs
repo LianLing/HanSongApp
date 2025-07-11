@@ -17,6 +17,8 @@ namespace HanSongApp.Views
         public string? SelectedLine { get; set; }
         public string? SelectedClassTeam { get; set; }
         public string? SelectedMo { get; set; }
+        public List<string> moList { get; set; } = new List<string>();
+        public string type_code = string.Empty;
 
         // 数据服务
         private readonly GetConditionService _dataService = new GetConditionService();
@@ -24,10 +26,9 @@ namespace HanSongApp.Views
         public SelectConditionPage(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-
             // 页面加载时初始化数据
             Loaded += async (sender, e) => await InitializeDataAsync();
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         private async Task InitializeDataAsync()
@@ -36,14 +37,14 @@ namespace HanSongApp.Views
             {
                 // 加载机型数据
                 List<Prod_TypeModel> prodtypes = await _dataService.OnProdTypeSelected();
-                prodTypePicker.ItemsSource = prodtypes.Count > 0 ? prodtypes.Select(p => p.name).ToList() : new List<string>();
+                prodTypePicker.ItemsSource = prodtypes.Count > 0 ? prodtypes : new List<string>();
 
                 // 加载线别数据
                 List<LineModel> lines = await _dataService.GetLineList();
-                LinePicker.ItemsSource = lines.Count > 0 ? lines.Select(l => l.name).ToList() : new List<string>();
+                LinePicker.ItemsSource = lines.Count > 0 ? lines : new List<string>();
                 //加载班组数据
                 List<TeamModel> classTeams = await _dataService.GetClassTeamList();
-                ClassTeamPicker.ItemsSource = classTeams.Count > 0 ? classTeams.Select(t => t.name).ToList() : new List<string>();
+                ClassTeamPicker.ItemsSource = classTeams.Count > 0 ? classTeams : new List<string>();
             }
             catch (Exception ex)
             {
@@ -98,18 +99,20 @@ namespace HanSongApp.Views
         {
             var picker = (Picker)sender;
             //机型决定数据库
-            SelectedProdType = picker.SelectedItem.ToString();
-
+            //SelectedProdType = picker.SelectedItem.ToString();
+            var selectedItem = picker.SelectedItem as Prod_TypeModel;
+            SelectedProdType = selectedItem?.name;
+            type_code = selectedItem?.code;
             // 根据选中的机型加载对应的工序、模组、制程、线别
-            if (SelectedProdType != null)
+            if (type_code != null)
             {
                 //获取工序列表
-                var models= await _dataService.GetModelList(SelectedProdType.ToString());
-                ModelPicker.ItemsSource = models.Count > 0 ? models.Select(m => m.prod_model).ToList() : new List<string>();
+                var models= await _dataService.GetModelList(type_code);
+                ModelPicker.ItemsSource = models.Count > 0 ? models : new List<modelModel>();
                 //获取模组列表
-                ModulePicker.ItemsSource = models.Count > 0 ? models.Select(m => m.prod_module).ToList() : new List<string>();
+                ModulePicker.ItemsSource = models.Count > 0 ? models : new List<modelModel>();
                 // 获取制程列表
-                var processes = await _dataService.GetProcessList(SelectedProdType.ToString());
+                var processes = await _dataService.GetProcessList(type_code);
                 ProcessPicker.ItemsSource = processes.Count > 0 ? processes.Select(p => p).ToList() : new List<string>();
                 
             }
@@ -118,35 +121,46 @@ namespace HanSongApp.Views
         private void OnModelSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            SelectedModel = picker.SelectedItem.ToString();
+            //SelectedModel = picker.SelectedItem.ToString();
+            var selectedItem = picker.SelectedItem as modelModel;
+            SelectedModel = selectedItem?.prod_model;
         }
 
         private void OnModuleTypeSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            SelectedModule = picker.SelectedItem.ToString();
+            //SelectedModule = picker.SelectedItem.ToString();
+            var selectedItem = picker.SelectedItem as modelModel;
+            SelectedModule = selectedItem?.prod_module;
         }
 
         private void OnProcessSelected(object sender, EventArgs e)
         {
-            var picker = (Picker)sender;
-            SelectedProcess = picker.SelectedItem.ToString();
+            //var picker = (Picker)sender;
+            //SelectedProcess = picker.SelectedItem.ToString();
+            SelectedProcess = ProcessPicker.SelectedItem?.ToString() ?? string.Empty;
         }
 
         private void OnLineSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            SelectedLine = picker.SelectedItem.ToString();
+            //SelectedLine = picker.SelectedItem.ToString();
+            var selectedItem = picker.SelectedItem as LineModel;
+            SelectedLine = selectedItem?.name;
         }
 
         private async void OnClassTeamSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            SelectedClassTeam = picker.SelectedItem.ToString();
+            //SelectedClassTeam = picker.SelectedItem.ToString();
+            var selectedItem = picker.SelectedItem as TeamModel;
+            SelectedClassTeam = selectedItem?.name;
+            string classTeamCode = selectedItem?.code ?? string.Empty;
             // 获取工单列表
-            if (!string.IsNullOrEmpty(SelectedClassTeam))
+            if (!string.IsNullOrEmpty(classTeamCode))
             {
-                var moList = await _dataService.GetMoList(SelectedClassTeam);
+                moList = await _dataService.GetMoList(classTeamCode);
+
             }
             
         }

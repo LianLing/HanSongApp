@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="HanSongApp.Views.LoginPage"
-             Title="µÇÂ¼"
+             Title="ç™»å½•"
              BackgroundColor="{AppThemeBinding Dark=Black, Light=White}">
 
     <Grid RowDefinitions="auto,auto,auto,auto,auto,auto,auto,*"
@@ -11,7 +12,7 @@
           VerticalOptions="CenterAndExpand"
           Padding="30">
 
-        <!-- LogoÇøÓò -->
+        <!-- LogoåŒºåŸŸ -->
         <Image Grid.Row="0"
                Grid.Column="1"
                Source="company_logo.png"
@@ -19,10 +20,10 @@
                HeightRequest="80"
                Margin="0,0,0,20"/>
 
-        <!-- ÓÃ»§ÃûÊäÈë¿ò -->
+        <!-- ç”¨æˆ·åè¾“å…¥æ¡† -->
         <Label Grid.Row="1" 
                Grid.Column="1"
-               Text="ÓÃ»§Ãû"
+               Text="ç”¨æˆ·å"
                FontSize="Medium"
                
                TextColor="{AppThemeBinding Dark=LightGray, Light=DarkSlateGray}"/>
@@ -35,7 +36,7 @@
                StrokeShape="RoundRectangle 5"
                Padding="5">
             <Entry x:Name="usernameEntry" 
-                   Placeholder="ÊäÈë¹¤ºÅ/ÓÃ»§Ãû"
+                   Placeholder="è¾“å…¥å·¥å·/ç”¨æˆ·å"
                    FontSize="18"
                    ClearButtonVisibility="WhileEditing"
                    Keyboard="Default"
@@ -45,10 +46,10 @@
             </Entry>
         </Border>
 
-        <!-- ÃÜÂëÊäÈë¿ò -->
+        <!-- å¯†ç è¾“å…¥æ¡† -->
         <Label Grid.Row="3" 
                Grid.Column="1"
-               Text="ÃÜÂë"
+               Text="å¯†ç "
                FontSize="Medium"
                TextColor="{AppThemeBinding Dark=LightGray, Light=DarkSlateGray}"/>
 
@@ -60,7 +61,7 @@
                StrokeShape="RoundRectangle 5"
                Padding="5">
             <Entry x:Name="passwordEntry" 
-                   Placeholder="ÊäÈëÃÜÂë"
+                   Placeholder="è¾“å…¥å¯†ç "
                    FontSize="18"
                    IsPassword="True"
                    ClearButtonVisibility="WhileEditing"
@@ -70,11 +71,11 @@
             </Entry>
         </Border>
 
-        <!-- µÇÂ¼°´Å¥ -->
+        <!-- ç™»å½•æŒ‰é’® -->
         <Button x:Name="loginButton"
                 Grid.Row="5" 
                 Grid.Column="1"
-                Text="µÇÂ¼"
+                Text="ç™»å½•"
                 FontSize="18"
                 HeightRequest="55"
                 Margin="0,20,0,0"
@@ -93,7 +94,7 @@
             </Button.Behaviors>
         </Button>
 
-        <!-- ¼ÓÔØÖ¸Ê¾Æ÷ -->
+        <!-- åŠ è½½æŒ‡ç¤ºå™¨ -->
         <ActivityIndicator x:Name="loadingIndicator" 
                            Grid.Row="6" 
                            Grid.Column="1"
@@ -103,7 +104,7 @@
                            VerticalOptions="Center"
                            HorizontalOptions="Center"/>
 
-        <!-- ×´Ì¬ÇøÓò/ÌáÊ¾ÐÅÏ¢ -->
+        <!-- çŠ¶æ€åŒºåŸŸ/æç¤ºä¿¡æ¯ -->
         <Label x:Name="statusLabel"
                Grid.Row="7" 
                Grid.Column="1"
@@ -114,7 +115,7 @@
                Margin="0,10,0,20"/>
     </Grid>
 
-    <!-- ÊÊÓÃÓÚ¹¤ÒµÊÖÌ×µÄ´¥ÃþÈÈÇøÀ©Õ¹ -->
+    <!-- é€‚ç”¨äºŽå·¥ä¸šæ‰‹å¥—çš„è§¦æ‘¸çƒ­åŒºæ‰©å±• -->
     <ContentPage.Resources>
         <Style TargetType="Button">
             <Setter Property="MinimumHeightRequest" Value="55"/>

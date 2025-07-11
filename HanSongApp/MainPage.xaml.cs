@@ -12,7 +12,7 @@ namespace HanSongApp
             _serviceProvider = serviceProvider;
         }
 
-        private async void OnNavigateToScanner(object sender, EventArgs e)
+        private async void SignIn_Clicked(object sender, EventArgs e)
         {
             // 通过依赖注入获取页面
             var conditionPage = _serviceProvider.GetRequiredService<SelectConditionPage>();

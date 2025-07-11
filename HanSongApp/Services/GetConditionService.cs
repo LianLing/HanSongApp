@@ -45,7 +45,7 @@ namespace HanSongApp.Services
             try
             {
                 //_db.Instance.CurrentConnectionConfig.ConnectionString = $@"Server=10.10.1.80;Port=3306;Database=hts_prod_{prod_type};Uid=htsusr;Pwd=HtsUsr.1;Connect Timeout=10;CharSet=utf8mb4;Pooling=false;";
-                string sql = $@"SELECTt.prod_type,t.prod_model,t.prod_module FROM cfg_model t WHERE prod_type = '{prod_type}' ORDER BY t.prod_model";
+                string sql = $@"SELECT t.prod_type,t.prod_model,t.prod_module FROM cfg_model t WHERE prod_type = '{prod_type}' ORDER BY t.prod_model";
                 var modules = await _db.Instance.Ado.SqlQueryAsync<modelModel>(sql);
                 return modules;
             }
@@ -127,9 +127,12 @@ namespace HanSongApp.Services
                 string endTime = tomorrowEnd.ToString("yyyy-MM-dd HH:mm:ss");
 
 
-                string sql = $@"select t.MO from MES_MO_PLAN t where t.TeamCode = '{teamcode}' and t.PlanEndTime BETWEEN {startTime} AND {endTime}";
-                var modules = await _db.Instance.Ado.SqlQueryAsync<string>(sql);
-                return modules;
+                string sql = $@"select t.MO+','+t.PartNo+','+t.OrderNO+','+t.PartName+','+t.STATUS as Mo from MES_MO_PLAN t where t.TeamCode = '{teamcode}' and t.PlanEndTime BETWEEN {startTime} AND {endTime}";
+                using (var sqlServerDb = new SqlSugarClient(sqlServerConfig))
+                {
+                    var mo = await sqlServerDb.Ado.SqlQueryAsync<string>(sql);
+                    return mo;
+                }
             }
             catch (Exception)
             {

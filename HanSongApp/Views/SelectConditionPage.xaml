@@ -25,7 +25,7 @@
                         Title="选择机型"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Prod_type}"
+                        ItemDisplayBinding="{Binding name}"
                         SelectedIndexChanged="OnProdTypeSelected">
 				</Picker>
 			</Border>
@@ -41,9 +41,8 @@
                         Title="选择工序"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Model}"
-                        IsEnabled="False"
-                        ItemsSource="{Binding Models}"
+                        ItemDisplayBinding="{Binding prod_model}"
+                        IsEnabled="True"
                         SelectedIndexChanged="OnModelSelected">
 				</Picker>
 			</Border>
@@ -59,7 +58,7 @@
                         Title="选择模组"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Module}"
+                        ItemDisplayBinding="{Binding prod_module}"
                         SelectedIndexChanged="OnModuleTypeSelected">
 				</Picker>
 			</Border>
@@ -75,7 +74,7 @@
                         Title="选择制程"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Process}"
+                        SelectedItem="{Binding SelectedProcess}"
                         SelectedIndexChanged="OnProcessSelected">
 				</Picker>
 			</Border>
@@ -91,7 +90,7 @@
                         Title="选择线别"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Line}"
+                        ItemDisplayBinding="{Binding name}"
                         SelectedIndexChanged="OnLineSelected">
 				</Picker>
 			</Border>
@@ -107,7 +106,7 @@
                         Title="选择班组"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding ClassTeam}"
+                        ItemDisplayBinding="{Binding name}"
                         SelectedIndexChanged="OnClassTeamSelected">
 				</Picker>
 			</Border>
@@ -123,7 +122,7 @@
                         Title="选择工单"
                         FontSize="16"
                         HeightRequest="50"
-                        ItemDisplayBinding="{Binding Mo}"
+                        ItemsSource="{Binding moList}"
                         SelectedIndexChanged="OnMOSelected">
 				</Picker>
 			</Border>

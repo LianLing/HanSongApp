@@ -32,19 +32,10 @@
                TextColor="Gray"/>
                     <Label Grid.Row="0" Grid.Column="1" 
                x:Name="stationNameLabel"
-               Text="出库站"
+               Text="单板入库"
                FontSize="16"
                FontAttributes="Bold"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" 
-               Text="操作员:" 
-               FontSize="16"
-               TextColor="Gray"/>
-                    <Label Grid.Row="1" Grid.Column="1" 
-               x:Name="operatorLabel"
-               Text="张三"
-               FontSize="16"
-               FontAttributes="Bold"/>
                 </Grid>
             </Frame>
 
