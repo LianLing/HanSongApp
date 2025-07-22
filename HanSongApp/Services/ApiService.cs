@@ -1,13 +1,15 @@
 ﻿using HanSongApp.Models;
+using HanSongApp.Models.HtsModels;
 using HanSongApp.Views;
 using Microsoft.Maui.Storage;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
-
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace HanSongApp.Services
 {
@@ -21,6 +23,13 @@ namespace HanSongApp.Services
             _httpClient = httpClient;
             _connectivity = connectivity;
 
+            // 强制使用 HTTP/2
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                _httpClient.DefaultRequestVersion = HttpVersion.Version20;
+                _httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            }
+
             // 从用户设置获取Token
             var token = Preferences.Default.Get("api_token", string.Empty);
             if (!string.IsNullOrEmpty(token))
@@ -30,16 +39,52 @@ namespace HanSongApp.Services
             }
 
             // 设置基础URL（生产环境/开发环境切换）
-#if DEBUG
             _httpClient.BaseAddress = new Uri("http://10.10.38.158:8201/htsapi/db1v0/");
-#else
-        _httpClient.BaseAddress = new Uri("https://api.industrial.com/v1");
-#endif
 
             // 设置默认超时时间
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
+
+            try
+            {
+                var testClient = new HttpClient();
+                var response = testClient.GetAsync("http://10.10.38.158").GetAwaiter().GetResult();
+                Console.WriteLine($"HTTP测试成功: {response.StatusCode}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"HTTP测试失败: {ex.Message}");
+            }
         }
 
+        // 新增：HTS API端点
+        private const string ChkInEndpoint = "chk_in";
+        private const string ChkOutEndpoint = "chk_out";
+        private const string GetSnInfoEndpoint = "get_sn_info";
+
+        /// <summary>
+        /// 执行入站检查 (chk_in)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> ChkInAsync(ChkInReq request)
+        {
+            var response =  await PostAsync<ChkInReq, Ack>(ChkInEndpoint, request, retryOnFailure: true);
+            return response;
+        }
+
+        /// <summary>
+        /// 上报测试结果 (chk_out)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> ChkOutAsync(ChkOutReq request)
+        {
+            return await PostAsync<ChkOutReq, Ack>(ChkOutEndpoint, request, retryOnFailure: true);
+        }
+
+        /// <summary>
+        /// 查询SN信息 (get_sn_info)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> GetSnInfoAsync(SnInfoReq request)
+        {
+            return await PostAsync<SnInfoReq, Ack>(GetSnInfoEndpoint, request, retryOnFailure: true);
+        }
 
         /// <summary>
         /// 用户登录
@@ -151,6 +196,14 @@ namespace HanSongApp.Services
                     }
                     await Task.Delay(1000 * retryCount);
                 }
+                catch (HttpRequestException ex) when (ex.Message.Contains("Cleartext"))
+                {
+                    // 特定处理明文流量错误
+                    return ApiResponse<TResult>.Error(
+                        "网络安全错误：请检查Android安全配置",
+                        495,  // 自定义错误码
+                        "CLEARTEXT_NOT_ALLOWED");
+                }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"API请求异常: {ex.Message}");
@@ -219,9 +272,9 @@ namespace HanSongApp.Services
         /// <summary>
         /// 检查网络连接
         /// </summary>
-        private bool IsNetworkAvailable()
+        public bool IsNetworkAvailable()
         {
-            if (_connectivity.NetworkAccess != NetworkAccess.Internet)
+            if (_connectivity.NetworkAccess != Microsoft.Maui.Networking.NetworkAccess.Internet)
             {
                 // 记录离线状态
                 return false;
@@ -229,35 +282,7 @@ namespace HanSongApp.Services
             return true;
         }
 
-        //public async Task<List<SnInfo>> GetStations(SnInfo input, string type_code)
-        //{
-        //    if (!IsNetworkAvailable())
-        //        return new List<SnInfo>(); // 修复：返回一个空的 List<f> 而不是 ApiResponse<SnInfo>
-
-        //    try
-        //    {
-        //        var request = new SnInfo
-        //        {
-        //            // 根据需要填充 request 对象
-        //        };
-
-        //        var response = await PostAsync<SnInfo, List<SnInfo>>("stations/get", request); 
-        //        if (response.IfSuccess)
-        //        {
-        //            return response.Data; // 返回成功的结果
-        //        }
-        //        else
-        //        {
-        //            Debug.WriteLine($"获取站点失败: {response.ErrorMessage}");
-        //            return new List<SnInfo>(); // 返回空列表以处理失败情况
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"获取站点异常: {ex.Message}");
-        //        return new List<SnInfo>(); // 返回空列表以处理异常情况
-        //    }
-        //}
+        
     }
 
      

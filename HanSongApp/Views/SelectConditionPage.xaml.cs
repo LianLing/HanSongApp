@@ -1,5 +1,7 @@
 ﻿
+using Dm.util;
 using HanSongApp.Models;
+using HanSongApp.Models.HtsModels;
 using HanSongApp.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -17,8 +19,9 @@ namespace HanSongApp.Views
         public string? SelectedLine { get; set; }
         public string? SelectedClassTeam { get; set; }
         public string? SelectedMo { get; set; }
-        public List<string> moList { get; set; } = new List<string>();
+
         public string type_code = string.Empty;
+        public string Station { get; set; } 
 
         // 数据服务
         private readonly GetConditionService _dataService = new GetConditionService();
@@ -77,22 +80,27 @@ namespace HanSongApp.Views
         // 确认按钮点击
         private async void OnConfirmClicked(object sender, EventArgs e)
         {
+            
             // 构建筛选条件
             var filter = new ProductInfo
             {
-                prod_type = SelectedProdType??"",
+                prod_type = type_code ?? "",
                 prod_model = SelectedModel??"",
                 prod_process_grp = SelectedModule??"",
                 prod_process = SelectedProcess??"",
                 Line = SelectedLine??"",
                 ClassTeam = SelectedClassTeam??"",
-                Mo = SelectedMo??""
+                Mo = SelectedMo.Substring(0, SelectedMo.indexOf(",")) ??""
             };
+            //查询站点
+            Station = await _dataService.GetStation(filter);
+            filter.Station = Station;
 
             // 通过依赖注入获取页面
             var singlepage = _serviceProvider.GetRequiredService<SingleRepositoryInPage>();
+            //设置筛选条件到目标页面的公共属性
+            singlepage.SetFilter(filter);
             await Navigation.PushAsync(singlepage);
-            //await Navigation.PushAsync(new SingleRepositoryIn(filter));
         }
 
         private async void OnProdTypeSelected(object sender, EventArgs e)
@@ -159,7 +167,8 @@ namespace HanSongApp.Views
             // 获取工单列表
             if (!string.IsNullOrEmpty(classTeamCode))
             {
-                moList = await _dataService.GetMoList(classTeamCode);
+                var moList = await _dataService.GetMoList(classTeamCode);
+                MoPicker.ItemsSource = moList.Count > 0 ? moList.Select(p => p).ToList() : new List<string>();
 
             }
             
@@ -167,8 +176,7 @@ namespace HanSongApp.Views
 
         private void OnMOSelected(object sender, EventArgs e)
         {
-            var picker = (Picker)sender;
-            SelectedMo = picker.SelectedItem.ToString();
+            SelectedMo = MoPicker.SelectedItem?.ToString() ?? string.Empty;
         }
     }
 }

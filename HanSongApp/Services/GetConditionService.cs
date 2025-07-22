@@ -1,5 +1,6 @@
 ﻿using HanSongApp.DataBase;
 using HanSongApp.Models;
+using HanSongApp.Models.HtsModels;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace HanSongApp.Services
             try
             {
                 //_db.Instance.CurrentConnectionConfig.ConnectionString = $@"Server=10.10.1.80;Port=3306;Database=hts_prod_{prod_type};Uid=htsusr;Pwd=HtsUsr.1;Connect Timeout=10;CharSet=utf8mb4;Pooling=false;";
-                string sql = $@"SELECT t.prod_type,t.prod_model,t.prod_module FROM cfg_model t WHERE prod_type = '{prod_type}' ORDER BY t.prod_model";
+                string sql = $@"SELECT distinct t.prod_type,t.prod_model,t.prod_module FROM cfg_model t WHERE prod_type = '{prod_type}' ORDER BY t.prod_model";
                 var modules = await _db.Instance.Ado.SqlQueryAsync<modelModel>(sql);
                 return modules;
             }
@@ -127,15 +128,41 @@ namespace HanSongApp.Services
                 string endTime = tomorrowEnd.ToString("yyyy-MM-dd HH:mm:ss");
 
 
-                string sql = $@"select t.MO+','+t.PartNo+','+t.OrderNO+','+t.PartName+','+t.STATUS as Mo from MES_MO_PLAN t where t.TeamCode = '{teamcode}' and t.PlanEndTime BETWEEN {startTime} AND {endTime}";
+                string sql = $@"select distinct t.MO+','+t.PartNo+','+t.OrderNO+','+t.PartName+','+t.STATUS as Mo from MES_MO_PLAN t where t.TeamCode = '{teamcode}' and t.PlanEndTime BETWEEN '{startTime}' AND '{endTime}'";
                 using (var sqlServerDb = new SqlSugarClient(sqlServerConfig))
                 {
-                    var mo = await sqlServerDb.Ado.SqlQueryAsync<string>(sql);
+                    var mo = await sqlServerDb.Ado.SqlQueryAsync<string>(sql).ConfigureAwait(false);
                     return mo;
                 }
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<string> GetStation(ProductInfo productInfo)
+        {
+            try
+            {
+                string sql = $@"SELECT
+                              t.prod_station
+                            FROM
+                              vw_eq_cfg_stn_distribute_code t,
+                              prod_station s
+                            WHERE
+                              t.prod_station = s.`code`
+                              AND s.`name` = '单板入库'
+                              AND t.prod_type = '{productInfo.prod_type}'
+                              AND t.prod_model = '{productInfo.prod_model}'
+                              AND t.prod_module = '{productInfo.prod_process_grp}'
+                              AND t.prod_process = '{productInfo.prod_process}'";
+                var station = await _db.Instance.Ado.SqlQuerySingleAsync<string>(sql);
+                return station;
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }

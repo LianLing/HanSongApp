@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HanSongApp.Models
+namespace HanSongApp.Models.HtsModels
 {
     public class ProductInfo
     {
@@ -33,5 +33,9 @@ namespace HanSongApp.Models
         /// 工单
         /// </summary>
         public string Mo { get; set; }
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public string Station { get; set; }
     }
 }

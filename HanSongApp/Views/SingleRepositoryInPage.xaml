@@ -7,6 +7,23 @@
 
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="15">
+
+            <!-- 当前站点信息 -->
+            <Frame CornerRadius="10" Padding="15" BackgroundColor="White">
+                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto" RowSpacing="10">
+                    <Label Grid.Row="0" Grid.Column="0" 
+   Text="当前站点:" 
+   FontSize="16"
+   TextColor="Gray"/>
+                    <Label Grid.Row="0" Grid.Column="1" 
+   x:Name="stationNameLabel"
+   Text="单板入库"
+   FontSize="16"
+   FontAttributes="Bold"/>
+
+                </Grid>
+            </Frame>
+            
             <!-- 条码输入区域 -->
             <Frame CornerRadius="10" Padding="15" BackgroundColor="White">
                 <VerticalStackLayout Spacing="15">
@@ -21,22 +38,6 @@
                            TextChanged="OnBarcodeTextChanged"
                            Completed="OnBarcodeCompleted"/>
                 </VerticalStackLayout>
-            </Frame>
-
-            <!-- 当前站点信息 -->
-            <Frame CornerRadius="10" Padding="15" BackgroundColor="White">
-                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto" RowSpacing="10">
-                    <Label Grid.Row="0" Grid.Column="0" 
-               Text="当前站点:" 
-               FontSize="16"
-               TextColor="Gray"/>
-                    <Label Grid.Row="0" Grid.Column="1" 
-               x:Name="stationNameLabel"
-               Text="单板入库"
-               FontSize="16"
-               FontAttributes="Bold"/>
-
-                </Grid>
             </Frame>
 
             <!-- 提交按钮 -->
