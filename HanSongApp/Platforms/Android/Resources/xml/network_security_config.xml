@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+	<!-- 允许访问 10.10.38.158 的明文 HTTP 流量 -->
 	<domain-config cleartextTrafficPermitted="true">
 		<domain includeSubdomains="true">10.10.38.158</domain>
-		<domain includeSubdomains="true">10.10.38.158:8201</domain>
+		<domain includeSubdomains="true">10.10.38.158:*</domain>
+		<!-- 包含所有端口 -->
 	</domain-config>
-	<base-config>
-		<!-- 生产环境使用系统默认 -->
-		<trust-anchors>
-			<certificates src="system" />
-		</trust-anchors>
-	</base-config>
+	<!-- 保留原有的 api.xxx.com 配置（如果需要） -->
+	<domain-config cleartextTrafficPermitted="true">
+		<domain includeSubdomains="true">api.xxx.com</domain>
+	</domain-config>
 </network-security-config>

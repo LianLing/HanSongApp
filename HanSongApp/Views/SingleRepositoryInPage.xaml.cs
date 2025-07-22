@@ -142,6 +142,7 @@ namespace HanSongApp.Views
                 };
                 //调用API服务
                 var response = await _apiService.ChkInAsync(chkInReq);
+
                 if (!response.IfSuccess)
                 {
                     await DisplayAlert("请求失败", $"网络错误: {response.ErrorMessage}", "确定");

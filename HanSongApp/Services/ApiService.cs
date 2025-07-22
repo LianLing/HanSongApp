@@ -1,7 +1,5 @@
-﻿using HanSongApp.Models;
-using HanSongApp.Models.HtsModels;
+﻿using HanSongApp.Models.HtsModels;
 using HanSongApp.Views;
-using Microsoft.Maui.Storage;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
@@ -9,6 +7,10 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+#if ANDROID
+using Xamarin.Android.Net;
+#endif
+
 
 
 namespace HanSongApp.Services
@@ -20,7 +22,12 @@ namespace HanSongApp.Services
 
         public ApiService(HttpClient httpClient, IConnectivity connectivity)
         {
-            _httpClient = httpClient;
+#if ANDROID
+            // 使用MAUI的Android客户端处理程序
+            _httpClient = new HttpClient(new AndroidMessageHandler());
+#else
+        _httpClient = new HttpClient();
+#endif
             _connectivity = connectivity;
 
             // 强制使用 HTTP/2
@@ -44,16 +51,16 @@ namespace HanSongApp.Services
             // 设置默认超时时间
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
 
-            try
-            {
-                var testClient = new HttpClient();
-                var response = testClient.GetAsync("http://10.10.38.158").GetAwaiter().GetResult();
-                Console.WriteLine($"HTTP测试成功: {response.StatusCode}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"HTTP测试失败: {ex.Message}");
-            }
+            //try
+            //{
+            //    var testClient = new HttpClient();
+            //    var response = testClient.GetAsync("http://10.10.38.158").GetAwaiter().GetResult();
+            //    Console.WriteLine($"HTTP测试成功: {response.StatusCode}");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"HTTP测试失败: {ex.Message}");
+            //}
         }
 
         // 新增：HTS API端点
@@ -69,6 +76,23 @@ namespace HanSongApp.Services
             var response =  await PostAsync<ChkInReq, Ack>(ChkInEndpoint, request, retryOnFailure: true);
             return response;
         }
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //public async Task<Ack> ChkInAsyncTest(ChkInReq request)
+        //{
+        //    var response = await _httpClient.GetAsync("http://10.10.38.158:8201/htsapi/db1v0/chk_in");
+        //    response.EnsureSuccessStatusCode();
+        //    //var content = await response.Content.ReadAsStringAsync();
+        //    var ack = await response.Content.ReadFromJsonAsync<Ack>(new JsonSerializerOptions
+        //    {
+        //        PropertyNameCaseInsensitive = true
+        //    });
+
+        //    return ack;
+        //}
 
         /// <summary>
         /// 上报测试结果 (chk_out)
