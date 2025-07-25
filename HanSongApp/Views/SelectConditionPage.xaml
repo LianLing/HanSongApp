@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HanSongApp.Views.SelectConditionPage"
+             Title="条件选择"
+             BackgroundColor="#F5F5F5">
+
+	<ScrollView>
+		<VerticalStackLayout Spacing="15" Padding="20">
+			<!-- 标题 -->
+			<Label Text="请选择筛选条件"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,10"/>
+
+			<!-- 条件1：机型 -->
+			<Label Text="机型:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+				<Picker x:Name="prodTypePicker"
+                        Title="选择机型"
+                        FontSize="16"
+                        HeightRequest="50"
+                        ItemDisplayBinding="{Binding name}"
+                        SelectedIndexChanged="OnProdTypeSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件2：工序 -->
+			<Label Text="工序:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+				<Picker x:Name="ModelPicker"
+                        Title="选择工序"
+                        FontSize="16"
+                        HeightRequest="50"
+                        ItemDisplayBinding="{Binding prod_model}"
+                        IsEnabled="True"
+                        SelectedIndexChanged="OnModelSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件3：模组 -->
+			<Label Text="模组:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+				<Picker x:Name="ModulePicker"
+                        Title="选择模组"
+                        FontSize="16"
+                        HeightRequest="50"
+                        ItemDisplayBinding="{Binding prod_module}"
+                        SelectedIndexChanged="OnModuleTypeSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件4：制程 -->
+			<Label Text="制程:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+                <Picker x:Name="ProcessPicker"
+                        Title="选择制程"
+                        FontSize="16"
+                        HeightRequest="50"
+                        SelectedItem="{Binding SelectedProcess}"
+                        SelectedIndexChanged="OnProcessSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件5：线别 -->
+			<Label Text="线别:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+                <Picker x:Name="LinePicker"
+                        Title="选择线别"
+                        FontSize="16"
+                        HeightRequest="50"
+                        ItemDisplayBinding="{Binding name}"
+                        SelectedIndexChanged="OnLineSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件6：班组 -->
+			<Label Text="班组:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+                <Picker x:Name="ClassTeamPicker"
+                        Title="选择班组"
+                        FontSize="16"
+                        HeightRequest="50"
+                        ItemDisplayBinding="{Binding name}"
+                        SelectedIndexChanged="OnClassTeamSelected">
+				</Picker>
+			</Border>
+
+			<!-- 条件7：工单 -->
+			<Label Text="工单:"
+                   FontSize="16"/>
+			<Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="5">
+				<Picker x:Name="MoPicker"
+                        Title="选择工单"
+                        FontSize="16"
+                        HeightRequest="50"
+                        SelectedItem="{Binding SelectedMo}"
+                        SelectedIndexChanged="OnMOSelected">
+				</Picker>
+			</Border>
+
+			<!-- 按钮区域 -->
+			<Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,20">
+				<Button Text="重置"
+                        Grid.Column="0"
+                        BackgroundColor="#FF5252"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Clicked="OnResetClicked"/>
+
+				<Button Text="确认"
+                        Grid.Column="1"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Clicked="OnConfirmClicked"/>
+			</Grid>
+		</VerticalStackLayout>
+	</ScrollView>
+</ContentPage>

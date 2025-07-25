@@ -2,10 +2,9 @@
 using HanSongApp.DataBase;
 using HanSongApp.Services;
 using HanSongApp.Views;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Net.Security;
-using System.Reflection;
+using Microsoft.Maui.Controls.PlatformConfiguration;
+using Microsoft.Maui.LifecycleEvents;
 
 namespace HanSongApp
 {
@@ -21,59 +20,85 @@ namespace HanSongApp
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                })
+                .ConfigureLifecycleEvents(events =>
+                {
+#if ANDROID
+                    // Android特定生命周期配置
+                    events.AddAndroid(android => android
+                        .OnCreate((activity, bundle) => ConfigureAndroidSecurity(activity))
+                    );
+#endif
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
-            // 注册HttpClient
-            builder.Services.AddSingleton<HttpClient>(serviceProvider =>
+            // 注册HttpClient服务（带安全配置）
+            builder.Services.AddHttpClient("SecureClient", httpClient =>
             {
-                var handler = new HttpClientHandler();
-
 #if ANDROID
-                // Android上信任所有HTTPS证书（开发环境使用）
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-                {
-                    if (errors == SslPolicyErrors.None) return true;
-#if DEBUG
-                    return true; // 调试模式信任所有证书
+                // 添加基础URL（针对Android的特殊安全需求）
+                httpClient.BaseAddress = new Uri("http://10.10.38.158:8201/htsapi/db1v0/");
 #else
-                return errors == SslPolicyErrors.None;
-#endif
-                };
+                httpClient.BaseAddress = new Uri("https://api.industrial.com/v1");
 #endif
 
-                return new HttpClient(handler);
+                httpClient.Timeout = TimeSpan.FromSeconds(30);
             });
 
-            // 注册API服务
+            // 注册所有服务
             builder.Services.AddSingleton<ApiService>();
-
-            // 注册其他所需服务
             builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
-
-            // 注册主页面
-            builder.Services.AddSingleton<MainPage>();
-
-
-            // 注册数据库上下文
             builder.Services.AddSingleton<DbContext>();
-
-            // 注册服务
             builder.Services.AddSingleton<CheckStationService>();
-            builder.Services.AddTransient<ScanBarCodePage>();
 
-            // 配置导航服务
-            var app = builder.Build();
+            // 注册所有页面
+            builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<SingleRepositoryInPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<SelectConditionPage>();
+
             return builder.Build();
         }
-        private static Stream GetAppSettingsStream()
+
+#if ANDROID
+        /// <summary>
+        /// 安卓平台安全配置 - 解决明文HTTP访问限制
+        /// </summary>
+        private static void ConfigureAndroidSecurity(Android.App.Activity activity)
         {
-            // 从程序集资源中读取 appsettings.json
-            var assembly = Assembly.GetExecutingAssembly();
-            return assembly.GetManifestResourceStream("HanSongApp.appsettings.json");
+            try
+            {
+                // Android 9.0+的特殊处理
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.P)
+                {
+                    // 使用反射设置安全策略
+                    var policyClass = Java.Lang.Class.ForName("android.net.NetworkSecurityPolicy");
+                    var setMethod = policyClass.GetMethod("setCleartextTrafficPermitted", Java.Lang.Boolean.Type);
+                    setMethod.Invoke(null, true);
+                    
+                    // 为特定IP地址添加例外
+                    var builderClass = Java.Lang.Class.ForName("android.net.NetworkSecurityPolicy$Builder");
+                    var newPolicy = builderClass.NewInstance();
+                    var addDomainMethod = builderClass.GetMethod("addDomain", Java.Lang.Class.FromType(typeof(Java.Lang.String)), Java.Lang.Boolean.Type);
+                    addDomainMethod.Invoke(newPolicy, "10.10.38.158", true);
+                    addDomainMethod.Invoke(newPolicy, "10.10.38.158:8201", true);
+                    
+                    var buildMethod = builderClass.GetMethod("build");
+                    var finalPolicy = buildMethod.Invoke(newPolicy);
+                    
+                    var setInstanceMethod = policyClass.GetMethod("setInstance", policyClass);
+                    setInstanceMethod.Invoke(null, finalPolicy);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 记录错误但不中断应用启动
+                System.Diagnostics.Debug.WriteLine($"安全配置失败: {ex.Message}");
+            }
         }
+#endif
     }
 }

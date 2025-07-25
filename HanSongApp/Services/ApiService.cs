@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using HanSongApp.Models.HtsModels;
+using HanSongApp.Views;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+
+
 
 namespace HanSongApp.Services
 {
-    using Microsoft.Maui.Storage; // for Preferences
-    using System.Diagnostics;
-    using System.Net.Http.Headers;
-    // ApiService.cs
-    using System.Net.Http.Json;
-    using System.Text;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
-
     public class ApiService
     {
         private readonly HttpClient _httpClient;
@@ -22,8 +20,17 @@ namespace HanSongApp.Services
 
         public ApiService(HttpClient httpClient, IConnectivity connectivity)
         {
-            _httpClient = httpClient;
+
+            // 使用MAUI的Android客户端处理程序
+            _httpClient = new HttpClient();
             _connectivity = connectivity;
+
+            // 强制使用 HTTP/2
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                _httpClient.DefaultRequestVersion = HttpVersion.Version20;
+                _httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            }
 
             // 从用户设置获取Token
             var token = Preferences.Default.Get("api_token", string.Empty);
@@ -34,14 +41,92 @@ namespace HanSongApp.Services
             }
 
             // 设置基础URL（生产环境/开发环境切换）
-#if DEBUG
-            _httpClient.BaseAddress = new Uri("https://dev-api.industrial.com/v1");
-#else
-        _httpClient.BaseAddress = new Uri("https://api.industrial.com/v1");
-#endif
+            _httpClient.BaseAddress = new Uri("http://10.10.38.158:8201/htsapi/db1v0/");
 
             // 设置默认超时时间
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
+
+            //try
+            //{
+            //    var testClient = new HttpClient();
+            //    var response = testClient.GetAsync("http://10.10.38.158").GetAwaiter().GetResult();
+            //    Console.WriteLine($"HTTP测试成功: {response.StatusCode}");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"HTTP测试失败: {ex.Message}");
+            //}
+        }
+
+        // 新增：HTS API端点
+        private const string ChkInEndpoint = "chk_in";
+        private const string ChkOutEndpoint = "chk_out";
+        private const string GetSnInfoEndpoint = "get_sn_info";
+
+        /// <summary>
+        /// 执行入站检查 (chk_in)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> ChkInAsync(ChkInReq request)
+        {
+            var response =  await PostAsync<ChkInReq, Ack>(ChkInEndpoint, request, retryOnFailure: true);
+            return response;
+        }
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //public async Task<Ack> ChkInAsyncTest(ChkInReq request)
+        //{
+        //    var response = await _httpClient.GetAsync("http://10.10.38.158:8201/htsapi/db1v0/chk_in");
+        //    response.EnsureSuccessStatusCode();
+        //    //var content = await response.Content.ReadAsStringAsync();
+        //    var ack = await response.Content.ReadFromJsonAsync<Ack>(new JsonSerializerOptions
+        //    {
+        //        PropertyNameCaseInsensitive = true
+        //    });
+
+        //    return ack;
+        //}
+
+        /// <summary>
+        /// 上报测试结果 (chk_out)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> ChkOutAsync(ChkOutReq request)
+        {
+            return await PostAsync<ChkOutReq, Ack>(ChkOutEndpoint, request, retryOnFailure: true);
+        }
+
+        /// <summary>
+        /// 查询SN信息 (get_sn_info)
+        /// </summary>
+        public async Task<ApiResponse<Ack>> GetSnInfoAsync(SnInfoReq request)
+        {
+            return await PostAsync<SnInfoReq, Ack>(GetSnInfoEndpoint, request, retryOnFailure: true);
+        }
+
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        public async Task<ApiResponse<LoginResponse>> LoginAsync(string username, string password)
+        {
+            if (!IsNetworkAvailable())
+                return ApiResponse<LoginResponse>.NoNetwork();
+
+            try
+            {
+                var request = new LoginRequest
+                {
+                    Username = username,
+                    Password = password
+                };
+
+                return await PostAsync<LoginRequest, LoginResponse>("auth/login", request);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<LoginResponse>.Error($"登录失败: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -130,6 +215,14 @@ namespace HanSongApp.Services
                     }
                     await Task.Delay(1000 * retryCount);
                 }
+                catch (HttpRequestException ex) when (ex.Message.Contains("Cleartext"))
+                {
+                    // 特定处理明文流量错误
+                    return ApiResponse<TResult>.Error(
+                        "网络安全错误：请检查Android安全配置",
+                        495,  // 自定义错误码
+                        "CLEARTEXT_NOT_ALLOWED");
+                }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"API请求异常: {ex.Message}");
@@ -198,16 +291,20 @@ namespace HanSongApp.Services
         /// <summary>
         /// 检查网络连接
         /// </summary>
-        private bool IsNetworkAvailable()
+        public bool IsNetworkAvailable()
         {
-            if (_connectivity.NetworkAccess != NetworkAccess.Internet)
+            if (_connectivity.NetworkAccess != Microsoft.Maui.Networking.NetworkAccess.Internet)
             {
                 // 记录离线状态
                 return false;
             }
             return true;
         }
+
+        
     }
+
+     
 
     /// <summary>
     /// API响应封装类

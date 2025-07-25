@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net8.0-android;net8.0-maccatalyst</TargetFrameworks>
 		
 		<OutputType>Exe</OutputType>
 		<RootNamespace>HanSongApp</RootNamespace>
@@ -11,8 +9,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+		<AndroidSdkMinVersion>21</AndroidSdkMinVersion>
+		<AndroidSdkTargetVersion>33</AndroidSdkTargetVersion>
+		<AndroidSupportedAbis>armeabi-v7a;arm64-v8a;x86_64</AndroidSupportedAbis>
 
-		<!-- Display name -->
 		<ApplicationTitle>HanSongApp</ApplicationTitle>
 
 		<!-- App Identifier -->
@@ -29,6 +29,10 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
+	<PropertyGroup>
+	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+	</PropertyGroup>
+	
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -48,9 +52,6 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <AndroidResource Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
@@ -60,17 +61,36 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="MySql.Data" Version="8.2.0" />
 		<PackageReference Include="SqlSugarCore" Version="5.1.4.197" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.36.0" />
+	</ItemGroup>
+
+	<!-- Android网络安全配置 -->
+	<ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+		<AndroidResource Include="Platforms/Android/Resources/xml/network_security_config.xml">
+			
+			<SubType>Component</SubType>
+		</AndroidResource>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="ViewModels\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="ViewModels\" />
+	  <Compile Update="Views\SingleRepositoryInPage.xaml.cs">
+	    <DependentUpon>SingleRepositoryInPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\ScanBarCodePage.xaml">
+	  <MauiXaml Update="Views\SingleRepositoryInPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\SelectConditionPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
