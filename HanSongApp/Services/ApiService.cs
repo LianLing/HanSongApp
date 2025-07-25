@@ -7,9 +7,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-#if ANDROID
-using Xamarin.Android.Net;
-#endif
+
 
 
 
@@ -22,12 +20,9 @@ namespace HanSongApp.Services
 
         public ApiService(HttpClient httpClient, IConnectivity connectivity)
         {
-#if ANDROID
+
             // 使用MAUI的Android客户端处理程序
-            _httpClient = new HttpClient(new AndroidMessageHandler());
-#else
-        _httpClient = new HttpClient();
-#endif
+            _httpClient = new HttpClient();
             _connectivity = connectivity;
 
             // 强制使用 HTTP/2
