@@ -38,12 +38,10 @@ namespace HanSongApp
             // 注册HttpClient服务（带安全配置）
             builder.Services.AddHttpClient("SecureClient", httpClient =>
             {
-#if ANDROID
+
                 // 添加基础URL（针对Android的特殊安全需求）
                 httpClient.BaseAddress = new Uri("http://10.10.38.158:8201/htsapi/db1v0/");
-#else
-                httpClient.BaseAddress = new Uri("https://api.industrial.com/v1");
-#endif
+
 
                 httpClient.Timeout = TimeSpan.FromSeconds(30);
             });
