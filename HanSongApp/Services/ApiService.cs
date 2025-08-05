@@ -22,12 +22,14 @@ namespace HanSongApp.Services
         {
 
             // 使用MAUI的Android客户端处理程序
-            _httpClient = new HttpClient();
             _connectivity = connectivity;
-
+            _httpClient = new HttpClient();
             // 强制使用 HTTP/2
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
+                //var handler = new AndroidMessageHandler();
+                //handler.Properties["http.allowCleartext"] = true; // 关键：允许明文HTTP
+
                 _httpClient.DefaultRequestVersion = HttpVersion.Version20;
                 _httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
             }
@@ -68,26 +70,10 @@ namespace HanSongApp.Services
         /// </summary>
         public async Task<ApiResponse<Ack>> ChkInAsync(ChkInReq request)
         {
-            var response =  await PostAsync<ChkInReq, Ack>(ChkInEndpoint, request, retryOnFailure: true);
+            var response =  await PostAsync<ChkInReq,Ack>(ChkInEndpoint, request, retryOnFailure: true);
             return response;
         }
-        /// <summary>
-        /// 测试
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        //public async Task<Ack> ChkInAsyncTest(ChkInReq request)
-        //{
-        //    var response = await _httpClient.GetAsync("http://10.10.38.158:8201/htsapi/db1v0/chk_in");
-        //    response.EnsureSuccessStatusCode();
-        //    //var content = await response.Content.ReadAsStringAsync();
-        //    var ack = await response.Content.ReadFromJsonAsync<Ack>(new JsonSerializerOptions
-        //    {
-        //        PropertyNameCaseInsensitive = true
-        //    });
-
-        //    return ack;
-        //}
+        
 
         /// <summary>
         /// 上报测试结果 (chk_out)
@@ -190,6 +176,9 @@ namespace HanSongApp.Services
                         "application/json");
 
                     var response = await _httpClient.PostAsync(endpoint, content);
+                    // 读取响应内容为字符串
+                    //string msg = await response.Content.ReadAsStringAsync();
+                    //var result = JsonSerializer.Deserialize<Ack>(msg);
                     var apiResponse = await ParseResponse<TResult>(response);
 
                     // 成功或致命错误直接返回

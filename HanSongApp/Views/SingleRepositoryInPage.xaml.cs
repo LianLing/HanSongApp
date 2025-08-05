@@ -153,18 +153,36 @@ namespace HanSongApp.Views
                 {
                     await DisplayAlert("入站成功", $"SN: {barcodeEntry.Text} 已成功入站", "确定");
                     // 执行后续操作...过站数+1
+                    //调用chk_out
+                    ChkOutReq chkOutReq = new ChkOutReq()
+                    {
+                        sn = barcodeEntry.Text,
+                        type_code = _currentFilter.prod_type,
+                        module_code = _currentFilter.prod_process_grp,
+                        stage_code = _currentFilter.prod_model,
+                        process_code = _currentFilter.prod_process,
+                        station_code = _currentFilter.Station,
+                        station_vercode = "1.0", // 示例版本号
+                        station_next = "NextStation", // 示例下一站
+                        test_rst = 0, // 测试结果
+                        note = "自动入站",
+                        jsonLog = "{}",
+                        mo = _currentFilter.Mo,
+                        elapse = 0,
+                        err_code = "",
+                        userid = "1023711",
+                        host_name = "111",
+                        prod_line = _currentFilter.Line,
+                        team = _currentFilter.ClassTeam,
+                        tool_name = "TestTool",
+                        tool_ver = "1.0"
+                    };
+                    var responseResult = await _apiService.ChkOutAsync(chkOutReq);
                 }
                 else
                 {
                     // 处理API业务错误
-                    string errorMsg = "未知错误";
-
-                    if (response.Data != null)
-                    {
-                        errorMsg = string.IsNullOrEmpty(response.Data.message) ?
-                            $"错误代码: {response.Data.result}" :
-                            response.Data.message;
-                    }
+                    string errorMsg = response.Data.message;
 
                     await DisplayAlert("入站失败", $"原因: {errorMsg}", "确定");
                 }
