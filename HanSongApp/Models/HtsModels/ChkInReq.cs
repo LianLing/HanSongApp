@@ -9,7 +9,7 @@ namespace HanSongApp.Models.HtsModels
     public class ChkInReq
     {
 
-        public SnInfo input = new SnInfo();
+        public SnInfo input { get; set; }
 
         public string type_code { get; set; }      // 机型代码
         public string module_code { get; set; }    // 模组代码

@@ -8,8 +8,8 @@ namespace HanSongApp.Models.HtsModels
 {
     public class SnInfo
     {
-        public string type = "";       // sn / var /res
-        public string key = "";        // csn / btmac /wifimac / deviceid ....
-        public string val = "";        // 
+        public string? type { get; set; }     // sn / var /res
+        public string? key { get; set; }       // csn / btmac /wifimac / deviceid ....
+        public string? val { get; set; }        // 
     }
 }

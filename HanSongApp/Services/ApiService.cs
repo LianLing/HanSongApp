@@ -170,8 +170,9 @@ namespace HanSongApp.Services
             {
                 try
                 {
+                    string s = JsonSerializer.Serialize(data);
                     using var content = new StringContent(
-                        JsonSerializer.Serialize(data),
+                        s,
                         Encoding.UTF8,
                         "application/json");
 

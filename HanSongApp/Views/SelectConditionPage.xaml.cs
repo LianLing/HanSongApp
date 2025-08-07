@@ -17,6 +17,7 @@ namespace HanSongApp.Views
         public string? SelectedModule { get; set; }
         public string? SelectedProcess { get; set; }
         public string? SelectedLine { get; set; }
+        public string? LineId { get; set; }
         public string? SelectedClassTeam { get; set; }
         public string? SelectedMo { get; set; }
 
@@ -89,6 +90,7 @@ namespace HanSongApp.Views
                 prod_process_grp = SelectedModule??"",
                 prod_process = SelectedProcess??"",
                 Line = SelectedLine??"",
+                LineId = LineId ?? "",
                 ClassTeam = SelectedClassTeam??"",
                 Mo = SelectedMo.Substring(0, SelectedMo.indexOf(",")) ??""
             };
@@ -155,6 +157,7 @@ namespace HanSongApp.Views
             //SelectedLine = picker.SelectedItem.ToString();
             var selectedItem = picker.SelectedItem as LineModel;
             SelectedLine = selectedItem?.name;
+            LineId = selectedItem?.code;
         }
 
         private async void OnClassTeamSelected(object sender, EventArgs e)

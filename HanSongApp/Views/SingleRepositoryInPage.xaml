@@ -9,21 +9,31 @@
         <VerticalStackLayout Spacing="20" Padding="15">
 
             <!-- 当前站点信息 -->
-            <Frame CornerRadius="10" Padding="15" BackgroundColor="White">
-                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto" RowSpacing="10">
+            <Frame CornerRadius="10" Padding="15"  BackgroundColor="White">
+                <Grid ColumnDefinitions="Auto, Auto,Auto,Auto" RowDefinitions="Auto, Auto,Auto,Auto" RowSpacing="5">
                     <Label Grid.Row="0" Grid.Column="0" 
    Text="当前站点:" 
    FontSize="16"
    TextColor="Gray"/>
                     <Label Grid.Row="0" Grid.Column="1" 
-   x:Name="stationNameLabel"
-   Text="单板入库"
-   FontSize="16"
-   FontAttributes="Bold"/>
+                       x:Name="stationNameLabel"
+                       Text="单板入库"
+                       FontSize="16"
+                       FontAttributes="Bold"/>
 
+                    <Label Grid.Row="0" Grid.Column="2" Margin="30,0,0,0"
+                           Text="过站次数:"
+                           FontSize="16"
+                           TextColor="Gray"
+                        />
+                    <Label Grid.Row="0" Grid.Column="3" Margin="15,0"
+                           x:Name="passCount"
+                           Text="0"
+                           FontSize="16"
+                           TextColor="Black"
+                        />
                 </Grid>
             </Frame>
-            
             <!-- 条码输入区域 -->
             <Frame CornerRadius="10" Padding="15" BackgroundColor="White">
                 <VerticalStackLayout Spacing="15">
@@ -40,18 +50,21 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- 提交按钮 -->
-            <Button x:Name="submitButton"
-                    Text="提交处理"
-                    Clicked="OnSubmitClicked"
-                    HorizontalOptions="Fill"
-                    FontSize="18"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White"
-                    Padding="15"
-                    CornerRadius="10"
-                    Margin="0,20"
-                    IsEnabled="False"/>
+
+            <Frame IsVisible="False" x:Name="chkOutFrame" CornerRadius="10" Padding="15" HeightRequest="160">
+                <Label 
+                    IsVisible="False"
+                    Padding="10"
+                    x:Name="chkOutResult"
+                    Text="NG"
+                    FontSize="50"
+                    TextColor="Black"
+                    
+                    VerticalTextAlignment="Center"
+                    HorizontalTextAlignment="Center"
+                    BackgroundColor="Red"
+                    />
+            </Frame>
 
             <!-- 历史记录 -->
             <Frame CornerRadius="10" Padding="15" BackgroundColor="White"

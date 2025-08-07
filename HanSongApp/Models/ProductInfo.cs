@@ -26,6 +26,10 @@ namespace HanSongApp.Models.HtsModels
         /// </summary>
         public string Line { get; set; }
         /// <summary>
+        /// 线别Id
+        /// </summary>
+        public string LineId { get; set; }
+        /// <summary>
         /// 班组
         /// </summary>
         public string ClassTeam { get; set; }

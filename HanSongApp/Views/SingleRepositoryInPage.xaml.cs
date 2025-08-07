@@ -19,10 +19,11 @@ namespace HanSongApp.Views
         private const string ChkOutEndpoint = "/htsapi/db1v0/chk_out";
         private readonly HttpClient _httpClient;
 
-        // 数据绑定属性
+        //数据绑定属性
         public ObservableCollection<Station> Stations { get; } = new();
         public bool IsLoading { get; private set; }
         public string ErrorMessage { get; private set; }
+        public int chkOutCount { get; set; } = 0;     //过站次数
 
         public SingleRepositoryInPage(ApiService apiService)
         {
@@ -151,7 +152,8 @@ namespace HanSongApp.Views
                 //处理响应结果
                 if (response.Data?.result == "SUCCESS")
                 {
-                    await DisplayAlert("入站成功", $"SN: {barcodeEntry.Text} 已成功入站", "确定");
+                    //await DisplayAlert("入站成功", $"SN: {barcodeEntry.Text} 已成功入站", "确定");
+
                     // 执行后续操作...过站数+1
                     //调用chk_out
                     ChkOutReq chkOutReq = new ChkOutReq()
@@ -162,29 +164,59 @@ namespace HanSongApp.Views
                         stage_code = _currentFilter.prod_model,
                         process_code = _currentFilter.prod_process,
                         station_code = _currentFilter.Station,
-                        station_vercode = "1.0", // 示例版本号
-                        station_next = "NextStation", // 示例下一站
-                        test_rst = 0, // 测试结果
-                        note = "自动入站",
-                        jsonLog = "{}",
+                        station_vercode = "00", 
+                        station_next = "", 
+                        test_rst = 0, 
+                        note = "备注",
+                        jsonLog = "",
                         mo = _currentFilter.Mo,
                         elapse = 0,
                         err_code = "",
                         userid = "1023711",
                         host_name = "111",
-                        prod_line = _currentFilter.Line,
+                        prod_line = _currentFilter.LineId,
                         team = _currentFilter.ClassTeam,
-                        tool_name = "TestTool",
-                        tool_ver = "1.0"
+                        tool_name = "单板入库",
+                        tool_ver = "1.0.0.0"
                     };
                     var responseResult = await _apiService.ChkOutAsync(chkOutReq);
+                    if (!responseResult.IfSuccess)
+                    {
+                        await DisplayAlert("请求失败", $"网络错误: {responseResult.ErrorMessage}", "确定");
+                        return;
+                    }
+                    if (responseResult.Data?.result == "SUCCESS")
+                    {
+                        chkOutCount += 1;
+                        passCount.Text = chkOutCount.ToString();
+                        //await DisplayAlert("出站成功", $"SN: {barcodeEntry.Text} 已成功出站", "确定");
+                        {
+                            chkOutFrame.IsVisible = true;
+                            chkOutResult.IsVisible = true;
+                            chkOutResult.BackgroundColor = Color.FromRgba("#4CAF50");
+                            chkOutResult.Text = "PASS";
+                            
+                        }
+                    }
+                    else
+                    {
+                        string errorMsg = responseResult.Data.message;
+                        //await DisplayAlert("出站失败", $"原因: {errorMsg}", "确定");
+                        {
+                            chkOutFrame.IsVisible = true;
+                            chkOutResult.IsVisible = true;
+                            chkOutResult.BackgroundColor = Color.FromRgba("#FF0000");
+                            chkOutResult.Text = "NG";
+                            
+                        }
+                    }
                 }
                 else
                 {
-                    // 处理API业务错误
-                    string errorMsg = response.Data.message;
-
-                    await DisplayAlert("入站失败", $"原因: {errorMsg}", "确定");
+                    chkOutFrame.IsVisible = true;
+                    chkOutResult.IsVisible = true;
+                    chkOutResult.BackgroundColor = Color.FromRgba("#FF0000");
+                    chkOutResult.Text = "NG";
                 }
             }
             catch (Exception)
@@ -196,12 +228,6 @@ namespace HanSongApp.Views
                 SetLoadingState(false, null);
                 barcodeEntry.Text = ""; // 清空扫码框
             }
-        }
-
-        // 提交按钮点击
-        private async void OnSubmitClicked(object sender, EventArgs e)
-        {
-            // 实现提交逻辑...
         }
 
         // 查看历史
