@@ -17,20 +17,32 @@
 			<!-- 条件1：机型 -->
 			<Label Text="机型:"
                    FontSize="16"/>
-			<Border Stroke="LightGray"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 5"
-                    Padding="5">
-				<Picker x:Name="prodTypePicker"
-                        Title="选择机型"
-                        FontSize="16"
-                        HeightRequest="50"
-                        ItemDisplayBinding="{Binding name}"
-                        SelectedIndexChanged="OnProdTypeSelected">
-				</Picker>
-			</Border>
+            <Border Stroke="LightGray"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 5"
+                Padding="5">    
+                <VerticalStackLayout>
+                    <!-- 搜索输入框 -->
+                    <Entry x:Name="prodTypeSearchEntry"
+                   Placeholder="输入机型关键词搜索..."
+                   FontSize="16"
+                   TextChanged="OnProdTypeSearchTextChanged"/>
 
-			<!-- 条件2：工序 -->
+                    <!-- 过滤后的结果列表 -->
+                    <ListView x:Name="prodTypeListView"
+                      HeightRequest="200"
+                      ItemSelected="OnProdTypeListItemSelected"
+                      IsVisible="False">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextCell Text="{Binding name}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 条件2：工序 -->
 			<Label Text="工序:"
                    FontSize="16"/>
 			<Border Stroke="LightGray"
