@@ -8,8 +8,8 @@ namespace HanSongApp.Models.HtsModels
 {
     public class SnInfoReq
     {
-        public SnInfo input = new SnInfo();
-        public string type_code = "";
-        public List<SnInfo> data = new List<SnInfo>();
+        public SnInfo input { get; set; }
+        public string type_code { get; set; }
+        public List<SnInfo> data { get; set; }
     }
 }

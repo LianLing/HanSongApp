@@ -24,6 +24,7 @@ namespace HanSongApp.Views
         public bool IsLoading { get; private set; }
         public string ErrorMessage { get; private set; }
         public int chkOutCount { get; set; } = 0;     //过站次数
+        public string errorMessage { get; set; } = string.Empty;
 
         public SingleRepositoryInPage(ApiService apiService)
         {
@@ -107,6 +108,8 @@ namespace HanSongApp.Views
         // 扫码完成
         private async void OnBarcodeCompleted(object sender, EventArgs e)
         {
+            //先隐藏过站结果
+            chkOutFrame.IsVisible = false;
             // 实现扫码完成逻辑...
             if (string.IsNullOrEmpty(barcodeEntry.Text))
                 return;
@@ -200,7 +203,7 @@ namespace HanSongApp.Views
                     }
                     else
                     {
-                        string errorMsg = responseResult.Data.message;
+                        errorMessage = responseResult.Data.message;
                         //await DisplayAlert("出站失败", $"原因: {errorMsg}", "确定");
                         {
                             chkOutFrame.IsVisible = true;
@@ -213,6 +216,7 @@ namespace HanSongApp.Views
                 }
                 else
                 {
+                    errorMessage = response.Data?.message ?? "未知错误";
                     chkOutFrame.IsVisible = true;
                     chkOutResult.IsVisible = true;
                     chkOutResult.BackgroundColor = Color.FromRgba("#FF0000");
@@ -234,6 +238,11 @@ namespace HanSongApp.Views
         private async void OnViewHistoryClicked(object sender, EventArgs e)
         {
             // 实现查看历史逻辑...
+        }
+
+        private void ChkOutResult_Tapped(object sender, TappedEventArgs e)
+        {
+            chkOutResult.Text = errorMessage;
         }
     }
 }

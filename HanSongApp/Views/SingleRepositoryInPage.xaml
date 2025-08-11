@@ -52,18 +52,22 @@
 
 
             <Frame IsVisible="False" x:Name="chkOutFrame" CornerRadius="10" Padding="15" HeightRequest="160">
-                <Label 
+                <Label
                     IsVisible="False"
                     Padding="10"
                     x:Name="chkOutResult"
                     Text="NG"
                     FontSize="50"
                     TextColor="Black"
-                    
                     VerticalTextAlignment="Center"
                     HorizontalTextAlignment="Center"
-                    BackgroundColor="Red"
-                    />
+                    BackgroundColor="Red">
+                <Label.GestureRecognizers>
+                     <TapGestureRecognizer 
+                        Tapped="ChkOutResult_Tapped" 
+                        NumberOfTapsRequired="1" />
+                    </Label.GestureRecognizers>
+                </Label>
             </Frame>
 
             <!-- 历史记录 -->
