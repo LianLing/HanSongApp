@@ -164,7 +164,7 @@ namespace HanSongApp.Views
                 Line = SelectedLine??"",
                 LineId = LineId ?? "",
                 ClassTeam = SelectedClassTeam??"",
-                Mo = SelectedMo.Substring(0, SelectedMo.indexOf(",")) ??""
+                Mo = SelectedMo?.Substring(0, SelectedMo.indexOf(",")) ??""
             };
             //查询站点
             Station = await _dataService.GetStation(filter);
@@ -177,33 +177,10 @@ namespace HanSongApp.Views
             await Navigation.PushAsync(singlepage);
         }
 
-        //private async void OnProdTypeSelected(object sender, EventArgs e)
-        //{
-        //    var picker = (Picker)sender;
-        //    //机型决定数据库
-        //    //SelectedProdType = picker.SelectedItem.ToString();
-        //    var selectedItem = picker.SelectedItem as Prod_TypeModel;
-        //    SelectedProdType = selectedItem?.name;
-        //    type_code = selectedItem?.code;
-        //    // 根据选中的机型加载对应的工序、模组、制程、线别
-        //    if (type_code != null)
-        //    {
-        //        //获取工序列表
-        //        var models= await _dataService.GetModelList(type_code);
-        //        ModelPicker.ItemsSource = models.Count > 0 ? models : new List<modelModel>();
-        //        //获取模组列表
-        //        ModulePicker.ItemsSource = models.Count > 0 ? models : new List<modelModel>();
-        //        // 获取制程列表
-        //        var processes = await _dataService.GetProcessList(type_code);
-        //        ProcessPicker.ItemsSource = processes.Count > 0 ? processes.Select(p => p).ToList() : new List<string>();
-                
-        //    }
-        //}
 
         private void OnModelSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            //SelectedModel = picker.SelectedItem.ToString();
             var selectedItem = picker.SelectedItem as modelModel;
             SelectedModel = selectedItem?.prod_model;
         }
@@ -226,7 +203,6 @@ namespace HanSongApp.Views
         private void OnLineSelected(object sender, EventArgs e)
         {
             var picker = (Picker)sender;
-            //SelectedLine = picker.SelectedItem.ToString();
             var selectedItem = picker.SelectedItem as LineModel;
             SelectedLine = selectedItem?.name;
             LineId = selectedItem?.code;
@@ -244,7 +220,6 @@ namespace HanSongApp.Views
             {
                 var moList = await _dataService.GetMoList(classTeamCode);
                 MoPicker.ItemsSource = moList.Count > 0 ? moList.Select(p => p).ToList() : new List<string>();
-
             }
             
         }
